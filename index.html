@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carpas Animadas</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      height: 100vh;
+      background-color: #87CEEB; /* Fundo azul claro */
+    }
+
+    .fish {
+      position: absolute;
+      width: 120px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: center;
+      transition: transform 0.1s;
+    }
+
+    /* Corpo da carpa (ajustado para vermelho escuro) */
+    .fish .body {
+      position: relative;
+      width: 100px;
+      height: 50px;
+      background: linear-gradient(145deg, #B22222, #8B0000); /* Gradiente de vermelho escuro */
+      border-radius: 40% 40% 50% 50%;
+      box-shadow: 0 0 10px rgba(139, 0, 0, 0.6); /* Sombra mais intensa de vermelho */
+      z-index: 1;
+    }
+
+    /* Cauda da carpa (ajustada para vermelho mais forte) */
+    .fish .tail {
+      position: absolute;
+      left: -20px;
+      bottom: 5px;
+      width: 50px;
+      height: 40px;
+      background: linear-gradient(145deg, #8B0000, #FF0000); /* Gradiente de vermelho forte */
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      transform-origin: center;
+      transition: transform 0.2s ease;
+      z-index: 0;
+    }
+
+    /* Olho da carpa */
+    .fish .eye {
+      position: absolute;
+      top: 10px;
+      left: 70px;
+      width: 12px;
+      height: 12px;
+      background-color: #FFFFFF;
+      border-radius: 50%;
+      box-shadow: inset 0 0 3px #000;
+    }
+
+    /* Pupila */
+    .fish .pupil {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 6px;
+      height: 6px;
+      background-color: #000;
+      border-radius: 50%;
+    }
+
+    /* Nadadeira dorsal (ajustada para vermelho mais forte) */
+    .fish .fin {
+      position: absolute;
+      top: 5px;
+      left: 30px;
+      width: 40px;
+      height: 15px;
+      background-color: #B22222; /* Vermelho escuro */
+      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+      transform: rotate(45deg);
+    }
+  </style>
+</head>
+<body>
+  <script>
+    const numberOfFish = 5; // Número de carpas
+
+    // Função para criar uma carpa
+    function createFish() {
+      const fish = document.createElement('div');
+      fish.classList.add('fish');
+      
+      const body = document.createElement('div');
+      body.classList.add('body');
+      
+      const tail = document.createElement('div');
+      tail.classList.add('tail');
+      
+      const eye = document.createElement('div');
+      eye.classList.add('eye');
+      const pupil = document.createElement('div');
+      pupil.classList.add('pupil');
+      eye.appendChild(pupil);
+      
+      const fin = document.createElement('div');
+      fin.classList.add('fin');
+      
+      fish.appendChild(tail);
+      fish.appendChild(body);
+      body.appendChild(eye);
+      body.appendChild(fin);
+      
+      document.body.appendChild(fish);
+      
+      return {
+        fishElement: fish,
+        bodyElement: body,
+        tailElement: tail,
+        eyeElement: eye,
+        pupilElement: pupil,
+        finElement: fin,
+        fishX: Math.random() * window.innerWidth, // Posição inicial aleatória
+        fishY: Math.random() * window.innerHeight,
+        lastAngle: 0, // Ângulo anterior da cauda
+        speed: 0.1, // Velocidade do movimento
+        targetX: Math.random() * window.innerWidth,
+        targetY: Math.random() * window.innerHeight
+      };
+    }
+
+    // Criar as carpas e armazená-las em um array
+    const fishArray = [];
+    for (let i = 0; i < numberOfFish; i++) {
+      fishArray.push(createFish());
+    }
+
+    // Atualizar a animação das carpas
+    function animateFish() {
+      fishArray.forEach(fish => {
+        // Movimento suave da carpa
+        fish.fishX += (fish.targetX - fish.fishX) * fish.speed;
+        fish.fishY += (fish.targetY - fish.fishY) * fish.speed;
+
+        // Calcula o ângulo para a direção do movimento
+        const angle = Math.atan2(fish.targetY - fish.fishY, fish.targetX - fish.fishX) * (180 / Math.PI);
+        
+        // Atualiza a posição e rotação do corpo da carpa
+        fish.fishElement.style.transform = `translate(${fish.fishX - 60}px, ${fish.fishY - 30}px) rotate(${angle}deg)`;
+        
+        // Suaviza o movimento da cauda
+        const tailAngle = fish.lastAngle + (angle - fish.lastAngle) * 0.2;
+        fish.tailElement.style.transform = `rotate(${tailAngle}deg)`;
+        fish.lastAngle = tailAngle;
+        
+        // Atualiza os destinos aleatórios da carpa
+        if (Math.abs(fish.targetX - fish.fishX) < 5 && Math.abs(fish.targetY - fish.fishY) < 5) {
+          fish.targetX = Math.random() * window.innerWidth;
+          fish.targetY = Math.random() * window.innerHeight;
+        }
+      });
+
+      requestAnimationFrame(animateFish);
+    }
+
+    animateFish();
+  </script>
+</body>
+</html>
